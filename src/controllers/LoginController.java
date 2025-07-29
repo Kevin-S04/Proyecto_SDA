@@ -102,7 +102,7 @@ public class LoginController implements ActionListener {
         JTextField correoField = new JTextField(20);
         JPasswordField claveField = new JPasswordField(20);
         JPasswordField confirmarClaveField = new JPasswordField(20);
-        JComboBox<String> rolBox = new JComboBox<>(new String[]{"Ganadero", "Inventariado", "Transportista", "Admin"});
+        JComboBox<String> rolBox = new JComboBox<>(new String[]{"Ganadero", "Inventariado", "Transportista"});
 
         JPanel panel = new JPanel(new GridLayout(5, 2, 5, 5)); // 5 filas, 2 columnas, 5px de espacio
         panel.add(new JLabel("Nombre:"));

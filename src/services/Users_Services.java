@@ -45,14 +45,11 @@ public class Users_Services {
         try {
             Document doc = coleccionUsuarios.find(and(
                     eq("correo", correo),
-                    eq("clave", clave), // Advertencia: Contraseña en texto plano. En producción, usar hashing.
+                    eq("clave", clave),
                     eq("rol", rol)
             )).first();
 
             if (doc != null) {
-                // Asegúrate de que el ID es un ObjectId para obtenerlo correctamente.
-                // Si "_id" es un String en tu DB, podrías necesitar `doc.getString("_id")`
-                // o manejar la conversión si es ObjectId.
                 String id = doc.getObjectId("_id").toHexString();
                 String nombre = doc.getString("nombre");
                 String foundRol = doc.getString("rol");
@@ -106,12 +103,8 @@ public class Users_Services {
      */
     public boolean actualizarContrasena(String correo, String nuevaClave) {
         try {
-            // Document filter = eq("correo", correo); // ESTA LÍNEA DABA EL ERROR
-            // Document update = set("clave", nuevaClave); // ESTA LÍNEA DABA EL ERROR
-
-            // Pasa directamente el resultado de eq() y set()
-            UpdateResult result = coleccionUsuarios.updateOne(eq("correo", correo), // Aquí el filtro
-                    set("clave", nuevaClave)); // Aquí la actualización
+            UpdateResult result = coleccionUsuarios.updateOne(eq("correo", correo),
+                    set("clave", nuevaClave));
 
             if (result.getModifiedCount() > 0) {
                 System.out.println("Contraseña del usuario " + correo + " actualizada correctamente.");
@@ -138,7 +131,6 @@ public class Users_Services {
         try {
             return coleccionUsuarios.find(eq("correo", correo)).first() != null;
         } catch (MongoException e) {
-            // Cambiado para imprimir el stack trace correctamente
             System.err.println("Error de MongoDB al verificar existencia de correo: " + e.getMessage());
             e.printStackTrace();
             return false;
