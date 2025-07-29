@@ -1,33 +1,50 @@
 package services;
+
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.MongoException;
 
-
+/**
+ * Clase ConexionDB que gestiona la conexión a la base de datos MongoDB Atlas.
+ * Implementa el patrón Singleton para asegurar una única instancia de MongoClient.
+ */
 public class ConexionDB {
 
-    private  static MongoClient mongoClient=null;
+    /** Instancia estática de MongoClient para la conexión a MongoDB. */
+    private static MongoClient mongoClient = null;
 
-    private static final String CONNECTION_STRING="mongodb+srv://simbanaalexis2004:12345@adcluster.hz5cw.mongodb.net/?retryWrites=true&w=majority&appName=ADCluster";
+    /** Cadena de conexión URI para MongoDB Atlas. */
+    private static final String CONNECTION_STRING = "mongodb+srv://simbanaalexis2004:12345@adcluster.hz5cw.mongodb.net/?retryWrites=true&w=majority&appName=ADCluster";
 
-    private  static final  String DATABASE_NAME="SDA";
+    /** Nombre de la base de datos a la que se conectará. */
+    private static final String DATABASE_NAME = "SDA";
 
-    private ConexionDB(){}
+    /**
+     * Constructor privado para aplicar el patrón Singleton y evitar instanciación externa.
+     */
+    private ConexionDB() {}
 
-    public static MongoClient getMongoClient(){
+    /**
+     * Obtiene una instancia del MongoClient. Si no existe, crea una nueva conexión a MongoDB Atlas.
+     * @return La instancia de MongoClient conectada.
+     */
+    public static MongoClient getMongoClient() {
         if (mongoClient == null) {
             try {
                 mongoClient = MongoClients.create(CONNECTION_STRING);
                 System.out.println("\nConexión a MongoDB Atlas establecida con éxito.");
             } catch (MongoException e) {
                 System.err.println("\nError al conectar con MongoDB Atlas: " + e.getMessage());
-                // Considera relanzar la excepción o manejarla de forma más robusta en una aplicación real.
             }
         }
         return mongoClient;
     }
 
+    /**
+     * Obtiene la instancia de MongoDatabase a partir del MongoClient.
+     * @return La instancia de MongoDatabase, o null si el cliente no está conectado.
+     */
     public static MongoDatabase getDatabase() {
         if (getMongoClient() != null) {
             return getMongoClient().getDatabase(DATABASE_NAME);
@@ -35,10 +52,13 @@ public class ConexionDB {
         return null;
     }
 
+    /**
+     * Cierra la conexión activa a MongoDB si existe.
+     */
     public static void closeConnection() {
         if (mongoClient != null) {
             mongoClient.close();
-            mongoClient = null; // Establecer a null para permitir una futura reconexión si es necesario
+            mongoClient = null;
             System.out.println("Conexión a MongoDB cerrada.");
         }
     }
