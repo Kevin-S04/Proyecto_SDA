@@ -4,12 +4,15 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import models.Usuario;
 import org.bson.Document;
+import org.bson.types.ObjectId; // Esta importación sigue siendo necesaria si usas ObjectId en algún lugar, aunque no directamente en los filtros mostrados.
 import static com.mongodb.client.model.Filters.*;
+import static com.mongodb.client.model.Updates.*;
 import com.mongodb.MongoException;
+import com.mongodb.client.result.UpdateResult;
 
 /**
  * Clase Users_Services que proporciona métodos para interactuar con la colección de usuarios en MongoDB.
- * Incluye funcionalidades para autenticación (login) y registro de usuarios.
+ * Incluye funcionalidades para autenticación (login), registro de usuarios y actualización de contraseñas.
  */
 public class Users_Services {
     /** Colección de MongoDB donde se almacenan los documentos de usuarios. */
@@ -42,11 +45,14 @@ public class Users_Services {
         try {
             Document doc = coleccionUsuarios.find(and(
                     eq("correo", correo),
-                    eq("clave", clave),
+                    eq("clave", clave), // Advertencia: Contraseña en texto plano. En producción, usar hashing.
                     eq("rol", rol)
             )).first();
 
             if (doc != null) {
+                // Asegúrate de que el ID es un ObjectId para obtenerlo correctamente.
+                // Si "_id" es un String en tu DB, podrías necesitar `doc.getString("_id")`
+                // o manejar la conversión si es ObjectId.
                 String id = doc.getObjectId("_id").toHexString();
                 String nombre = doc.getString("nombre");
                 String foundRol = doc.getString("rol");
@@ -77,7 +83,7 @@ public class Users_Services {
 
             Document doc = new Document("nombre", usuario.getNombre())
                     .append("correo", usuario.getCorreo())
-                    .append("clave", usuario.getClave())
+                    .append("clave", usuario.getClave()) // ATENCIÓN DE SEGURIDAD: ¡APLICAR HASHING DE CLAVES AQUÍ ANTES DE GUARDAR!
                     .append("rol", usuario.getRol());
 
             coleccionUsuarios.insertOne(doc);
@@ -85,6 +91,37 @@ public class Users_Services {
             return true;
         } catch (MongoException e) {
             System.err.println("Error de MongoDB al insertar usuario: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Actualiza la contraseña de un usuario en la base de datos.
+     * Requiere el correo electrónico del usuario para identificarlo.
+     * @param correo El correo electrónico del usuario cuya contraseña se va a actualizar.
+     * @param nuevaClave La nueva contraseña a establecer.
+     * @return {@code true} si la contraseña se actualizó correctamente (se encontró y modificó un usuario),
+     * {@code false} en caso contrario (usuario no encontrado o error de base de datos).
+     */
+    public boolean actualizarContrasena(String correo, String nuevaClave) {
+        try {
+            // Document filter = eq("correo", correo); // ESTA LÍNEA DABA EL ERROR
+            // Document update = set("clave", nuevaClave); // ESTA LÍNEA DABA EL ERROR
+
+            // Pasa directamente el resultado de eq() y set()
+            UpdateResult result = coleccionUsuarios.updateOne(eq("correo", correo), // Aquí el filtro
+                    set("clave", nuevaClave)); // Aquí la actualización
+
+            if (result.getModifiedCount() > 0) {
+                System.out.println("Contraseña del usuario " + correo + " actualizada correctamente.");
+                return true;
+            } else {
+                System.out.println("No se encontró al usuario " + correo + " para actualizar la contraseña.");
+                return false;
+            }
+        } catch (MongoException e) {
+            System.err.println("Error de MongoDB al actualizar contraseña: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -101,6 +138,7 @@ public class Users_Services {
         try {
             return coleccionUsuarios.find(eq("correo", correo)).first() != null;
         } catch (MongoException e) {
+            // Cambiado para imprimir el stack trace correctamente
             System.err.println("Error de MongoDB al verificar existencia de correo: " + e.getMessage());
             e.printStackTrace();
             return false;

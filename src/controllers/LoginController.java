@@ -12,8 +12,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import com.mongodb.MongoException;
-import javax.swing.SpringLayout;
-import javax.swing.Spring;
 
 /**
  * Clase LoginController que gestiona la lógica de negocio para la ventana de inicio de sesión (LoginView).
@@ -100,13 +98,13 @@ public class LoginController implements ActionListener {
      * Permite al usuario ingresar los datos básicos y llama al servicio de usuarios.
      */
     private void abrirOpcionCrearCuenta() {
-        JTextField nombreField = new JTextField();
-        JTextField correoField = new JTextField();
-        JPasswordField claveField = new JPasswordField();
-        JPasswordField confirmarClaveField = new JPasswordField();
+        JTextField nombreField = new JTextField(20);
+        JTextField correoField = new JTextField(20);
+        JPasswordField claveField = new JPasswordField(20);
+        JPasswordField confirmarClaveField = new JPasswordField(20);
         JComboBox<String> rolBox = new JComboBox<>(new String[]{"Ganadero", "Inventariado", "Transportista", "Admin"});
 
-        JPanel panel = new JPanel(new SpringLayout());
+        JPanel panel = new JPanel(new GridLayout(5, 2, 5, 5)); // 5 filas, 2 columnas, 5px de espacio
         panel.add(new JLabel("Nombre:"));
         panel.add(nombreField);
         panel.add(new JLabel("Correo:"));
@@ -117,11 +115,6 @@ public class LoginController implements ActionListener {
         panel.add(confirmarClaveField);
         panel.add(new JLabel("Rol:"));
         panel.add(rolBox);
-
-        SpringUtilities.makeCompactGrid(panel,
-                5, 2,
-                6, 6,
-                6, 6);
 
         int result = JOptionPane.showConfirmDialog(loginView, panel, "Registrar Nuevo Usuario",
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
@@ -148,7 +141,7 @@ public class LoginController implements ActionListener {
                 if (registrado) {
                     Mensajes.mostrarInformacion(loginView, "Usuario registrado exitosamente.");
                 } else {
-                    Mensajes.mostrarError(loginView, "No se pudo registrar el usuario. El correo podría ya estar en uso.");
+                    Mensajes.mostrarError(loginView, "No se pudo registrar el usuario. El correo podría ya estar en uso o hubo un error de DB.");
                 }
             } catch (MongoException e) {
                 Mensajes.mostrarError(loginView, "Error al registrar usuario en la base de datos: " + e.getMessage());
@@ -159,15 +152,49 @@ public class LoginController implements ActionListener {
 
     /**
      * Muestra un diálogo de JOptionPane para la recuperación de contraseña.
-     * Pide al usuario su correo electrónico.
+     * Pide al usuario su correo electrónico y una nueva contraseña.
      */
     private void abrirOpcionRecuperarContrasena() {
-        String correo = JOptionPane.showInputDialog(loginView, "Ingrese su correo electrónico para recuperar la contraseña:", "Recuperar Contraseña", JOptionPane.QUESTION_MESSAGE);
+        JTextField correoField = new JTextField(20);
+        JPasswordField nuevaClaveField = new JPasswordField(20);
+        JPasswordField confirmarNuevaClaveField = new JPasswordField(20);
 
-        if (correo != null && !correo.trim().isEmpty()) {
-            Mensajes.mostrarInformacion(loginView, "Se ha solicitado la recuperación de contraseña para: " + correo + "\n(Funcionalidad no implementada completamente)");
-        } else if (correo != null) {
-            Mensajes.mostrarAdvertencia(loginView, "Debe ingresar un correo electrónico.");
+        JPanel panel = new JPanel(new GridLayout(3, 2, 5, 5)); // 3 filas, 2 columnas, 5px de espacio
+        panel.add(new JLabel("Correo Electrónico:"));
+        panel.add(correoField);
+        panel.add(new JLabel("Nueva Contraseña:"));
+        panel.add(nuevaClaveField);
+        panel.add(new JLabel("Confirmar Nueva Contraseña:"));
+        panel.add(confirmarNuevaClaveField);
+
+        int result = JOptionPane.showConfirmDialog(loginView, panel, "Recuperar/Restablecer Contraseña",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (result == JOptionPane.OK_OPTION) {
+            String correo = correoField.getText();
+            String nuevaClave = new String(nuevaClaveField.getPassword());
+            String confirmarNuevaClave = new String(confirmarNuevaClaveField.getPassword());
+
+            if (correo.isEmpty() || nuevaClave.isEmpty() || confirmarNuevaClave.isEmpty()) {
+                Mensajes.mostrarAdvertencia(loginView, "Todos los campos son obligatorios para restablecer la contraseña.");
+                return;
+            }
+            if (!nuevaClave.equals(confirmarNuevaClave)) {
+                Mensajes.mostrarError(loginView, "Las nuevas contraseñas no coinciden.");
+                return;
+            }
+
+            try {
+                boolean actualizado = usersServices.actualizarContrasena(correo, nuevaClave);
+                if (actualizado) {
+                    Mensajes.mostrarInformacion(loginView, "Contraseña actualizada exitosamente.");
+                } else {
+                    Mensajes.mostrarError(loginView, "No se pudo actualizar la contraseña. El correo electrónico no fue encontrado.");
+                }
+            } catch (MongoException e) {
+                Mensajes.mostrarError(loginView, "Error al actualizar contraseña en la base de datos: " + e.getMessage());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -180,71 +207,5 @@ public class LoginController implements ActionListener {
         String mensaje = "¡Bienvenido, " + rol + "!\nHas accedido a tu panel principal.";
         Mensajes.mostrarInformacion(null, mensaje);
         System.exit(0);
-    }
-
-    /**
-     * Clase interna auxiliar para SpringLayout.
-     */
-    private static class SpringUtilities {
-        /**
-         * A la luz de un JPanel que usa SpringLayout, establece los componentes en un diseño de cuadrícula.
-         * @param parent El panel que usa SpringLayout.
-         * @param rows Número de filas.
-         * @param cols Número de columnas.
-         * @param initialX Distancia del lado izquierdo del primer componente.
-         * @param initialY Distancia de la parte superior del primer componente.
-         * @param xPad Acolchado horizontal entre componentes.
-         * @param yPad Acolchado vertical entre componentes.
-         */
-        public static void makeCompactGrid(Container parent,
-                                           int rows, int cols,
-                                           int initialX, int initialY,
-                                           int xPad, int yPad) {
-            SpringLayout layout;
-            try {
-                layout = (SpringLayout)parent.getLayout();
-            } catch (ClassCastException exc) {
-                System.err.println("The first argument to makeCompactGrid must use SpringLayout.");
-                return;
-            }
-
-            Spring x = Spring.constant(initialX);
-            for (int c = 0; c < cols; c++) {
-                Spring width = Spring.constant(0);
-                for (int r = 0; r < rows; r++) {
-                    width = Spring.max(width,
-                            layout.getConstraints(parent.getComponent(r * cols + c)).
-                                    getWidth());
-                }
-                for (int r = 0; r < rows; r++) {
-                    SpringLayout.Constraints constraints = layout.getConstraints(
-                            parent.getComponent(r * cols + c));
-                    constraints.setX(x);
-                    constraints.setWidth(width);
-                }
-                x = Spring.sum(x, Spring.sum(width, Spring.constant(xPad)));
-            }
-
-            Spring y = Spring.constant(initialY);
-            for (int r = 0; r < rows; r++) {
-                Spring height = Spring.constant(0);
-                for (int c = 0; c < cols; c++) {
-                    height = Spring.max(height,
-                            layout.getConstraints(parent.getComponent(r * cols + c)).
-                                    getHeight());
-                }
-                for (int c = 0; c < cols; c++) {
-                    SpringLayout.Constraints constraints = layout.getConstraints(
-                            parent.getComponent(r * cols + c));
-                    constraints.setY(y);
-                    constraints.setHeight(height);
-                }
-                y = Spring.sum(y, Spring.sum(height, Spring.constant(yPad)));
-            }
-
-            SpringLayout.Constraints pCons = layout.getConstraints(parent);
-            pCons.setConstraint(SpringLayout.EAST, x);
-            pCons.setConstraint(SpringLayout.SOUTH, y);
-        }
     }
 }

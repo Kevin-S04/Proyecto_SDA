@@ -6,7 +6,7 @@ import java.awt.*;
 /**
  * Clase LoginView que representa la interfaz gráfica de usuario para el inicio de sesión.
  * Permite al usuario ingresar su correo, contraseña y seleccionar un rol para autenticarse.
- * Esta versión construye la interfaz completamente por código, sin un diseñador de formularios.
+ * Esta versión construye la interfaz completamente por código, utilizando un diseño simple con GridLayout.
  */
 public class LoginView extends JFrame {
     private JPanel loginPanel;
@@ -19,83 +19,65 @@ public class LoginView extends JFrame {
 
     /**
      * Constructor de la clase LoginView.
-     * Inicializa y organiza todos los componentes de la interfaz de usuario.
+     * Inicializa y organiza todos los componentes de la interfaz de usuario con un diseño simple.
      */
     public LoginView() {
         setTitle("Login");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(600, 400);
-        setLocationRelativeTo(null);
+        setSize(400, 350); // Tamaño ajustado para un diseño más simple
+        setLocationRelativeTo(null); // Centra la ventana en la pantalla
 
-        loginPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
+        loginPanel = new JPanel();
+        loginPanel.setLayout(new GridLayout(8, 1, 10, 10)); // 8 filas, 1 columna, 10px de espacio horizontal y vertical
 
-        // Título o Cabecera
-        JLabel titleLabel = new JLabel("Distribución de Alimentos Agropecuarios");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 2;
-        gbc.anchor = GridBagConstraints.CENTER;
-        loginPanel.add(titleLabel, gbc);
+        // Título
+        JLabel titleLabel = new JLabel("Bienvenido", SwingConstants.CENTER); // Centrar texto
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        loginPanel.add(titleLabel);
 
         // Campo de Usuario (Correo)
-        gbc.gridwidth = 1;
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.anchor = GridBagConstraints.EAST;
-        loginPanel.add(new JLabel("Usuario (Correo):"), gbc);
-
-        usuarioText = new JTextField(20);
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        gbc.anchor = GridBagConstraints.WEST;
-        loginPanel.add(usuarioText, gbc);
+        JPanel userPanel = new JPanel(new FlowLayout(FlowLayout.CENTER)); // Panel para centrar el campo
+        userPanel.add(new JLabel("Usuario (Correo):"));
+        usuarioText = new JTextField(15); // Tamaño más pequeño
+        userPanel.add(usuarioText);
+        loginPanel.add(userPanel);
 
         // Campo de Contraseña
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.anchor = GridBagConstraints.EAST;
-        loginPanel.add(new JLabel("Contraseña:"), gbc);
-
-        password = new JPasswordField(20);
-        gbc.gridx = 1;
-        gbc.gridy = 2;
-        gbc.anchor = GridBagConstraints.WEST;
-        loginPanel.add(password, gbc);
+        JPanel passPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        passPanel.add(new JLabel("Contraseña:"));
+        password = new JPasswordField(15);
+        passPanel.add(password);
+        loginPanel.add(passPanel);
 
         // Selector de Rol
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.anchor = GridBagConstraints.EAST;
-        loginPanel.add(new JLabel("Rol:"), gbc);
-
+        JPanel rolPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        rolPanel.add(new JLabel("Rol:"));
         rolBox = new JComboBox<>(new String[]{"Ganadero", "Inventariado", "Transportista", "Admin"});
-        gbc.gridx = 1;
-        gbc.gridy = 3;
-        gbc.anchor = GridBagConstraints.WEST;
-        loginPanel.add(rolBox, gbc);
+        rolPanel.add(rolBox);
+        loginPanel.add(rolPanel);
 
         // Botón Iniciar Sesión
+        JPanel btnLoginPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         iniciarSesionButton = new JButton("Iniciar Sesión");
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        gbc.gridwidth = 2; // Ocupa dos columnas
-        gbc.anchor = GridBagConstraints.CENTER;
-        loginPanel.add(iniciarSesionButton, gbc);
+        btnLoginPanel.add(iniciarSesionButton);
+        loginPanel.add(btnLoginPanel);
 
         // Botón Crear Cuenta
+        JPanel btnRegisterPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         crearCuentaButton = new JButton("Crear Cuenta");
-        gbc.gridy = 5; // Una fila más abajo
-        loginPanel.add(crearCuentaButton, gbc);
+        btnRegisterPanel.add(crearCuentaButton);
+        loginPanel.add(btnRegisterPanel);
 
         // Etiqueta Recuperar Contraseña
+        JPanel recoverPassPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         recuperarContraseñaLabel = new JLabel("<html><u>¿Olvidaste tu contraseña?</u></html>");
-        recuperarContraseñaLabel.setForeground(Color.BLUE.darker()); // Color azul para simular enlace
-        recuperarContraseñaLabel.setCursor(new Cursor(Cursor.HAND_CURSOR)); // Cursor de mano al pasar por encima
-        gbc.gridy = 6; // Una fila más abajo
-        loginPanel.add(recuperarContraseñaLabel, gbc);
+        recuperarContraseñaLabel.setForeground(Color.BLUE.darker());
+        recuperarContraseñaLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        recoverPassPanel.add(recuperarContraseñaLabel);
+        loginPanel.add(recoverPassPanel);
+
+        // Añadir un panel vacío para empujar los elementos hacia arriba o para rellenar el espacio
+        loginPanel.add(new JPanel()); // Esto es para que GridLayout tenga 8 filas y el espacio se distribuya un poco mejor.
 
         // Agrega el panel principal al JFrame
         this.add(loginPanel);
