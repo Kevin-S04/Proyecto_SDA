@@ -4,7 +4,6 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import models.Usuario;
 import org.bson.Document;
-import org.bson.types.ObjectId; // Esta importación sigue siendo necesaria si usas ObjectId en algún lugar, aunque no directamente en los filtros mostrados.
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Updates.*;
 import com.mongodb.MongoException;
@@ -45,14 +44,11 @@ public class Users_Services {
         try {
             Document doc = coleccionUsuarios.find(and(
                     eq("correo", correo),
-                    eq("clave", clave), // Advertencia: Contraseña en texto plano. En producción, usar hashing.
+                    eq("clave", clave),
                     eq("rol", rol)
             )).first();
 
             if (doc != null) {
-                // Asegúrate de que el ID es un ObjectId para obtenerlo correctamente.
-                // Si "_id" es un String en tu DB, podrías necesitar `doc.getString("_id")`
-                // o manejar la conversión si es ObjectId.
                 String id = doc.getObjectId("_id").toHexString();
                 String nombre = doc.getString("nombre");
                 String foundRol = doc.getString("rol");
@@ -83,7 +79,7 @@ public class Users_Services {
 
             Document doc = new Document("nombre", usuario.getNombre())
                     .append("correo", usuario.getCorreo())
-                    .append("clave", usuario.getClave()) // ATENCIÓN DE SEGURIDAD: ¡APLICAR HASHING DE CLAVES AQUÍ ANTES DE GUARDAR!
+                    .append("clave", usuario.getClave())
                     .append("rol", usuario.getRol());
 
             coleccionUsuarios.insertOne(doc);
@@ -106,12 +102,8 @@ public class Users_Services {
      */
     public boolean actualizarContrasena(String correo, String nuevaClave) {
         try {
-            // Document filter = eq("correo", correo); // ESTA LÍNEA DABA EL ERROR
-            // Document update = set("clave", nuevaClave); // ESTA LÍNEA DABA EL ERROR
-
-            // Pasa directamente el resultado de eq() y set()
-            UpdateResult result = coleccionUsuarios.updateOne(eq("correo", correo), // Aquí el filtro
-                    set("clave", nuevaClave)); // Aquí la actualización
+            UpdateResult result = coleccionUsuarios.updateOne(eq("correo", correo),
+                    set("clave", nuevaClave));
 
             if (result.getModifiedCount() > 0) {
                 System.out.println("Contraseña del usuario " + correo + " actualizada correctamente.");
