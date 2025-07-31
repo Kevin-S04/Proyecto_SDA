@@ -12,6 +12,7 @@ public class Main {
      * @param args Argumentos de la línea de comandos (no utilizados en este caso).
      */
     public static void main(String[] args) {
+
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
