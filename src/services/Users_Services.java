@@ -130,7 +130,6 @@ public class Users_Services {
         try {
             return coleccionUsuarios.find(eq("correo", correo)).first() != null;
         } catch (MongoException e) {
-            // Cambiado para imprimir el stack trace correctamente
             System.err.println("Error de MongoDB al verificar existencia de correo: " + e.getMessage());
             e.printStackTrace();
             return false;

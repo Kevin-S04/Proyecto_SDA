@@ -2,6 +2,9 @@ package controllers;
 
 import models.Usuario;
 import services.Users_Services;
+
+import views.GanaderoView;
+import views.InventarioView;
 import views.LoginView;
 import utils.Mensajes;
 
@@ -12,6 +15,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import com.mongodb.MongoException;
+import views.TrasportistaView;
 
 /**
  * Clase LoginController que gestiona la lógica de negocio para la ventana de inicio de sesión (LoginView).
@@ -79,7 +83,24 @@ public class LoginController implements ActionListener {
             if (usuarioAutenticado != null) {
                 Mensajes.mostrarInformacion(loginView, "¡Inicio de sesión exitoso como " + usuarioAutenticado.getRol() + "!");
                 loginView.dispose();
-                mostrarPantallaPrincipalPorRol(usuarioAutenticado.getRol());
+
+                // Mostrar formulario segun el rol
+                String rol= usuarioAutenticado.getRol();
+                switch (rol){
+                    case "Admin":
+                        System.out.println("En construcción");
+                        break;
+                    case "Ganadero":
+                        GanaderoView gnv=new GanaderoView();
+                        gnv.setVisible(true);
+                        break;
+                    case "Iventario":
+                        InventarioView in = new InventarioView();
+                        in.setVisible(true);
+                    case "Tranportista":
+                        TrasportistaView tr=new TrasportistaView();
+                        tr.setVisible(true);
+                }
 
             } else {
                 Mensajes.mostrarError(loginView, "Correo, clave o rol incorrectos.");
@@ -92,7 +113,6 @@ public class LoginController implements ActionListener {
             e.printStackTrace();
         }
     }
-
     /**
      * Muestra un diálogo de JOptionPane para el registro de un nuevo usuario.
      * Permite al usuario ingresar los datos básicos y llama al servicio de usuarios.
@@ -102,7 +122,7 @@ public class LoginController implements ActionListener {
         JTextField correoField = new JTextField(20);
         JPasswordField claveField = new JPasswordField(20);
         JPasswordField confirmarClaveField = new JPasswordField(20);
-        JComboBox<String> rolBox = new JComboBox<>(new String[]{"Ganadero", "Inventariado", "Transportista", "Admin"});
+        JComboBox<String> rolBox = new JComboBox<>(new String[]{"Ganadero", "Inventariado", "Transportista"});
 
         JPanel panel = new JPanel(new GridLayout(5, 2, 5, 5)); // 5 filas, 2 columnas, 5px de espacio
         panel.add(new JLabel("Nombre:"));
@@ -196,16 +216,5 @@ public class LoginController implements ActionListener {
                 e.printStackTrace();
             }
         }
-    }
-
-    /**
-     * Simula la apertura de una pantalla principal diferente según el rol del usuario,
-     * mostrando un mensaje informativo con JOptionPane y cerrando la aplicación.
-     * @param rol El rol del usuario autenticado.
-     */
-    private void mostrarPantallaPrincipalPorRol(String rol) {
-        String mensaje = "¡Bienvenido, " + rol + "!\nHas accedido a tu panel principal.";
-        Mensajes.mostrarInformacion(null, mensaje);
-        System.exit(0);
     }
 }
