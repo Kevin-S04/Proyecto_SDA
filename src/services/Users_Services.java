@@ -147,4 +147,25 @@ public class Users_Services {
             return false;
         }
     }
+
+    public List<Usuario> obtenerTodosLosUsuarios() {
+        List<Usuario> lista = new ArrayList<>();
+        try (MongoCursor<Document> cursor = coleccionUsuarios.find().iterator()) {
+            while (cursor.hasNext()) {
+                Document doc = cursor.next();
+                Usuario user = new Usuario(
+                        doc.getObjectId("_id").toHexString(),
+                        doc.getString("nombre"),
+                        doc.getString("correo"),
+                        doc.getString("clave"),
+                        doc.getString("rol")
+                );
+                lista.add(user);
+            }
+        } catch (MongoException e) {
+            System.err.println("Error al obtener usuarios: " + e.getMessage());
+        }
+        return lista;
+    }
+
 }

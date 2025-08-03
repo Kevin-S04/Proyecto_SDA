@@ -3,10 +3,7 @@ package controllers;
 import models.Usuario;
 import services.Users_Services;
 
-import views.GanaderoView;
-import views.InventarioView;
-import views.LoginView;
-import views.TransportistaView; // Importación añadida
+import views.*;
 import utils.Mensajes;
 
 import javax.swing.*;
@@ -88,7 +85,9 @@ public class LoginController implements ActionListener {
                 String rol = usuarioAutenticado.getRol();
                 switch (rol) {
                     case "Admin":
-                        System.out.println("En construcción");
+                        AdminView ad=new AdminView();
+                        ad.setVisible(true);
+
                         break;
                     case "Ganadero":
                         GanaderoView gnv = new GanaderoView();
