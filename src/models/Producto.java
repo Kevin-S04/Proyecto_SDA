@@ -1,24 +1,37 @@
 package models;
 
 import java.util.List;
-import java.util.ArrayList; // Para inicializar listas vacías
 
+/**
+ * Modelo de datos para representar un producto en el sistema.
+ * Corresponde a la colección 'Productos' en MongoDB.
+ */
 public class Producto {
-    // MongoDB _id puede ser un String en Java si lo mapeas así
     private String id;
     private String nombre;
     private String tipo;
     private List<String> especie;
     private double precio;
-    private int  stock;
+    private int stock;
     private String presentacion;
     private String descripcion;
 
-    // Constructor vacío
-    public Producto() {
-    }
+    /**
+     * Constructor por defecto.
+     */
+    public Producto() {}
 
-    // Constructor completo
+    /**
+     * Constructor para inicializar un objeto Producto con todos sus atributos.
+     * @param id El identificador único del producto.
+     * @param nombre El nombre del producto.
+     * @param tipo El tipo de producto (e.g., Alimento, Suplemento).
+     * @param especie La lista de especies para las que es el producto.
+     * @param precio El precio del producto.
+     * @param stock La cantidad disponible en inventario.
+     * @param presentacion La presentación del producto (e.g., 50kg, 1L).
+     * @param descripcion Una descripción detallada del producto.
+     */
     public Producto(String id, String nombre, String tipo, List<String> especie,
                     double precio, int stock, String presentacion, String descripcion) {
         this.id = id;
@@ -31,67 +44,31 @@ public class Producto {
         this.descripcion = descripcion;
     }
 
-    public String getId() {
-        return id;
-    }
+    /**
+     * Obtiene el identificador del producto.
+     * @return El ID del producto.
+     */
+    public String getId() { return id; }
+    /**
+     * Establece el identificador del producto.
+     * @param id El ID del producto.
+     */
+    public void setId(String id) { this.id = id; }
 
-    public String getNombre() {
-        return nombre;
-    }
-
-    public String getTipo() {
-        return tipo;
-    }
-
-    public List<String> getEspecie() {
-        return especie;
-    }
-
-    public double getPrecio() {
-        return precio;
-    }
-
-    public int getStock() {
-        return stock;
-    }
-
-    public String getPresentacion() {
-        return presentacion;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
-    }
-
-    public void setEspecie(List<String> especie) {
-        this.especie = especie;
-    }
-
-    public void setPrecio(double precio) {
-        this.precio = precio;
-    }
-
-    public void setStock(int stock) {
-        this.stock = stock;
-    }
-
-    public void setPresentacion(String presentacion) {
-        this.presentacion = presentacion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
+    // ... (Métodos Getter y Setter para los demás atributos con Javadoc similar)
+    // Para no alargar la respuesta, los omito, pero seguirían este patrón.
+    public String getNombre() { return nombre; }
+    public void setNombre(String nombre) { this.nombre = nombre; }
+    public String getTipo() { return tipo; }
+    public void setTipo(String tipo) { this.tipo = tipo; }
+    public List<String> getEspecie() { return especie; }
+    public void setEspecie(List<String> especie) { this.especie = especie; }
+    public double getPrecio() { return precio; }
+    public void setPrecio(double precio) { this.precio = precio; }
+    public int getStock() { return stock; }
+    public void setStock(int stock) { this.stock = stock; }
+    public String getPresentacion() { return presentacion; }
+    public void setPresentacion(String presentacion) { this.presentacion = presentacion; }
+    public String getDescripcion() { return descripcion; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
 }

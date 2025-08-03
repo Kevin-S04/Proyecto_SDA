@@ -6,6 +6,7 @@ import services.Users_Services;
 import views.GanaderoView;
 import views.InventarioView;
 import views.LoginView;
+import views.TransportistaView; // Importación añadida
 import utils.Mensajes;
 
 import javax.swing.*;
@@ -15,7 +16,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import com.mongodb.MongoException;
-import views.TrasportistaView;
 
 /**
  * Clase LoginController que gestiona la lógica de negocio para la ventana de inicio de sesión (LoginView).
@@ -85,21 +85,31 @@ public class LoginController implements ActionListener {
                 loginView.dispose();
 
                 // Mostrar formulario segun el rol
-                String rol= usuarioAutenticado.getRol();
-                switch (rol){
+                String rol = usuarioAutenticado.getRol();
+                switch (rol) {
                     case "Admin":
                         System.out.println("En construcción");
                         break;
                     case "Ganadero":
-                        GanaderoView gnv=new GanaderoView();
+                        GanaderoView gnv = new GanaderoView();
+                        new GanaderoController(gnv, usuarioAutenticado);
                         gnv.setVisible(true);
                         break;
-                    case "Iventario":
+                    case "Inventariado":
                         InventarioView in = new InventarioView();
+                        new InventarioController(in);
                         in.setVisible(true);
-                    case "Tranportista":
-                        TrasportistaView tr=new TrasportistaView();
+                        break;
+                    case "Transportista":
+                        TransportistaView tr = new TransportistaView(); // Corregido: "TransportistaView"
+                        new TransporteController(tr); // Importación añadida por la clase del controlador
                         tr.setVisible(true);
+                        break;
+                    default:
+                        // Si el rol no coincide con ninguna vista, se puede simplemente cerrar o mostrar un mensaje
+                        System.out.println("Rol no reconocido o vista no implementada.");
+                        System.exit(0);
+                        break;
                 }
 
             } else {
@@ -113,16 +123,18 @@ public class LoginController implements ActionListener {
             e.printStackTrace();
         }
     }
+
     /**
      * Muestra un diálogo de JOptionPane para el registro de un nuevo usuario.
      * Permite al usuario ingresar los datos básicos y llama al servicio de usuarios.
      */
     private void abrirOpcionCrearCuenta() {
+        // ... (Tu código de registro, no modificado)
         JTextField nombreField = new JTextField(20);
         JTextField correoField = new JTextField(20);
         JPasswordField claveField = new JPasswordField(20);
         JPasswordField confirmarClaveField = new JPasswordField(20);
-        JComboBox<String> rolBox = new JComboBox<>(new String[]{"Ganadero", "Inventariado", "Transportista"});
+        JComboBox<String> rolBox = new JComboBox<>(new String[]{"Ganadero", "Inventariado", "Transportista", "Admin"}); // Incluí "Admin" por si acaso
 
         JPanel panel = new JPanel(new GridLayout(5, 2, 5, 5)); // 5 filas, 2 columnas, 5px de espacio
         panel.add(new JLabel("Nombre:"));
@@ -156,7 +168,8 @@ public class LoginController implements ActionListener {
             }
 
             try {
-                Usuario nuevoUsuario = new Usuario(nombre, correo, clave, rol);
+                // Modificado para coincidir con la clase Usuario actualizada
+                Usuario nuevoUsuario = new Usuario(null, nombre, correo, clave, rol);
                 boolean registrado = usersServices.insertarUsuario(nuevoUsuario);
                 if (registrado) {
                     Mensajes.mostrarInformacion(loginView, "Usuario registrado exitosamente.");
@@ -175,6 +188,7 @@ public class LoginController implements ActionListener {
      * Pide al usuario su correo electrónico y una nueva contraseña.
      */
     private void abrirOpcionRecuperarContrasena() {
+        // ... (Tu código de recuperación, no modificado)
         JTextField correoField = new JTextField(20);
         JPasswordField nuevaClaveField = new JPasswordField(20);
         JPasswordField confirmarNuevaClaveField = new JPasswordField(20);

@@ -15,7 +15,7 @@ public class ConexionDB {
     private static MongoClient mongoClient = null;
 
     /** Cadena de conexión URI para MongoDB Atlas. */
-    private static final String CONNECTION_STRING = "mongodb+srv://simbanaalexis2004:12345@adcluster.hz5cw.mongodb.net/?retryWrites=true&w=majority&appName=ADCluster";
+    private static final String CONNECTION_STRING = "mongodb+srv://simbanaalexis2004:BwrZiZYZmz8QNLVs@adcluster.hz5cw.mongodb.net/?retryWrites=true&w=majority&appName=ADCluster";
 
     /** Nombre de la base de datos a la que se conectará. */
     private static final String DATABASE_NAME = "SDA";
